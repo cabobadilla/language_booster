@@ -69,11 +69,13 @@ if st.button("Generar Texto y Preguntas"):
             try:
                 raw_content = response_explicacion_y_preguntas['choices'][0]['message']['content'].strip()
 
-                # Validar y limpiar el JSON si es necesario
-                if not raw_content.startswith('{') or not raw_content.endswith('}'):
-                    raise ValueError("El JSON generado no está bien delimitado.")
+                # Sanitizar contenido JSON
+                sanitized_content = raw_content.strip()
+                if not sanitized_content.startswith('{') or not sanitized_content.endswith('}'):
+                    sanitized_content = sanitized_content[sanitized_content.find('{'):sanitized_content.rfind('}') + 1]
 
-                resultado = json.loads(raw_content)
+                # Parsear JSON
+                resultado = json.loads(sanitized_content)
                 explicacion = resultado.get("explicacion", "No se pudo generar una explicación.")
                 preguntas = resultado.get("preguntas", [])
             except (json.JSONDecodeError, ValueError) as e:
