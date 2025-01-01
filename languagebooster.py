@@ -28,19 +28,22 @@ if st.button("Generar Texto y Preguntas"):
             openai.api_key = st.secrets["openai"]["api_key"]
 
             # Prompt para generar texto
-            prompt = (
-                f"Genera un texto en {idioma.lower()} con un nivel de dificultad {nivel} "
+            prompt_texto = (
+                f"Escribe un texto en {idioma.lower()} con un nivel de dificultad {nivel} "
                 f"sobre el tema {tema}. El texto debe tener entre 150 y 200 palabras, ser interesante, "
                 "real y con hechos relevantes."
             )
 
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=200,
+            response_texto = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Eres un experto en generar textos educativos."},
+                    {"role": "user", "content": prompt_texto},
+                ],
                 temperature=0.7,
+                max_tokens=200,
             )
-            texto_generado = response.choices[0].text.strip()
+            texto_generado = response_texto['choices'][0]['message']['content'].strip()
 
             # Mostrar texto generado
             st.subheader("Texto Generado")
@@ -53,13 +56,16 @@ if st.button("Generar Texto y Preguntas"):
                 f"y opciones en un formato estructurado en JSON."
             )
 
-            response_preguntas = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt_preguntas,
-                max_tokens=300,
+            response_preguntas = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Eres un generador de preguntas educativas."},
+                    {"role": "user", "content": prompt_preguntas},
+                ],
                 temperature=0.7,
+                max_tokens=300,
             )
-            preguntas_json = eval(response_preguntas.choices[0].text.strip())
+            preguntas_json = eval(response_preguntas['choices'][0]['message']['content'].strip())
             preguntas = preguntas_json["preguntas"]
 
             st.subheader("Preguntas de Comprensión")
