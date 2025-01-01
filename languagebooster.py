@@ -1,7 +1,6 @@
 import streamlit as st
-import openai  # Usar el cliente OpenAI correctamente
-import random
-import json  # Para manejar JSON de forma segura
+import openai
+import json
 
 # Configuración inicial
 st.set_page_config(page_title="Your Language Booster", layout="centered")
@@ -23,16 +22,16 @@ tema = st.selectbox("Selecciona el tema", ["Viajes", "Historia", "Cultura Genera
 
 # Botón para generar texto y preguntas
 if st.button("Generar Texto y Preguntas"):
-    with st.spinner("Generando texto y preguntas..."):
+    with st.spinner("Generando contenido..."):
         try:
-            # Usar la clave API almacenada en secretos
+            # Configuración de la API
             openai.api_key = st.secrets["openai"]["api_key"]
 
-            # Prompt para generar texto
+            # Prompt para generar texto y título
             prompt_texto = (
                 f"Escribe un texto en {idioma.lower()} con un nivel de dificultad {nivel} "
                 f"sobre el tema {tema}. El texto debe tener entre 150 y 200 palabras, ser interesante, "
-                "real y con hechos relevantes."
+                "real y con hechos relevantes. También proporciona un título breve y relevante para el texto."
             )
 
             response_texto = openai.ChatCompletion.create(
@@ -42,20 +41,15 @@ if st.button("Generar Texto y Preguntas"):
                     {"role": "user", "content": prompt_texto},
                 ],
                 temperature=0.7,
-                max_tokens=200,
+                max_tokens=300,
             )
             texto_generado = response_texto['choices'][0]['message']['content'].strip()
 
-            # Mostrar texto generado
-            st.subheader("Texto Generado")
-            st.write(texto_generado)
-
-            # Generar preguntas de comprensión
+            # Prompt para generar preguntas
             prompt_preguntas = (
-                f"A partir del siguiente texto, genera 5 preguntas de selección múltiple con 4 opciones "
-                f"y una sola respuesta correcta. El texto es: \"{texto_generado}\". "
-                "Devuelve las preguntas en formato JSON. Ejemplo: "
-                '{"preguntas": [{"pregunta": "Pregunta 1", "opciones": ["A", "B", "C", "D"], "correcta": "A"}]}'
+                f"Basándote en el siguiente texto, genera 5 preguntas simples de opción múltiple "
+                f"que evalúen la comprensión del texto. No incluyas respuestas correctas ni formato JSON. "
+                f"Texto: \"{texto_generado}\""
             )
 
             response_preguntas = openai.ChatCompletion.create(
@@ -67,39 +61,17 @@ if st.button("Generar Texto y Preguntas"):
                 temperature=0.7,
                 max_tokens=300,
             )
+            preguntas_generadas = response_preguntas['choices'][0]['message']['content'].strip()
 
-            # Parsear respuesta JSON
-            try:
-                preguntas_json = json.loads(response_preguntas['choices'][0]['message']['content'].strip())
-                preguntas = preguntas_json["preguntas"]
-            except json.JSONDecodeError:
-                st.error("Hubo un error al procesar las preguntas. Intenta nuevamente.")
-                st.stop()
+            # Mostrar título, texto y preguntas
+            st.subheader("Título del Texto")
+            st.write(f"📖 {texto_generado.splitlines()[0]}")  # Supongamos que el título está en la primera línea
 
-            # Mostrar preguntas de comprensión
+            st.subheader("Texto Generado")
+            st.write("\n".join(texto_generado.splitlines()[1:]))  # El resto es el texto
+
             st.subheader("Preguntas de Comprensión")
-            respuestas_usuario = []
+            st.markdown(preguntas_generadas)
 
-            for i, pregunta in enumerate(preguntas):
-                st.write(f"**{i + 1}. {pregunta['pregunta']}**")
-                opciones = pregunta["opciones"]
-                respuesta_usuario = st.radio(
-                    f"Selecciona una respuesta para la pregunta {i + 1}",
-                    opciones,
-                    key=f"pregunta_{i}",
-                )
-                respuestas_usuario.append((respuesta_usuario, pregunta["correcta"]))
-
-            if st.button("Evaluar Respuestas"):
-                total_correctas = 0
-                for i, (respuesta, correcta) in enumerate(respuestas_usuario):
-                    if respuesta == correcta:
-                        st.success(f"Pregunta {i + 1}: Correcta ✅")
-                        total_correctas += 1
-                    else:
-                        st.error(f"Pregunta {i + 1}: Incorrecta ❌ (Respuesta correcta: {correcta})")
-
-                st.subheader("Resultados")
-                st.write(f"Respuestas correctas: {total_correctas}/{len(preguntas)}")
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
