@@ -51,6 +51,7 @@ if st.button("Generar Texto y Preguntas"):
                 f"acerca de los principales puntos o temas que el lector debería haber entendido o aprendido "
                 f"del texto. Después de la explicación, genera 5 preguntas simples en {idioma.lower()} que evalúen la comprensión. "
                 f"Devuelve los resultados en formato JSON estructurado con las claves: 'explicacion' y 'preguntas'. "
+                f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
             )
 
@@ -64,13 +65,20 @@ if st.button("Generar Texto y Preguntas"):
                 max_tokens=400,
             )
 
-            # Parsear el JSON generado
+            # Intentar parsear el JSON generado
             try:
-                resultado = json.loads(response_explicacion_y_preguntas['choices'][0]['message']['content'].strip())
+                raw_content = response_explicacion_y_preguntas['choices'][0]['message']['content'].strip()
+
+                # Validar y limpiar el JSON si es necesario
+                if not raw_content.startswith('{') or not raw_content.endswith('}'):
+                    raise ValueError("El JSON generado no está bien delimitado.")
+
+                resultado = json.loads(raw_content)
                 explicacion = resultado.get("explicacion", "No se pudo generar una explicación.")
                 preguntas = resultado.get("preguntas", [])
-            except json.JSONDecodeError:
-                st.error("Error al procesar el formato JSON de las preguntas. Intenta nuevamente.")
+            except (json.JSONDecodeError, ValueError) as e:
+                st.error(f"Error al procesar el formato JSON de las preguntas. Detalles: {e}")
+                st.text_area("Contenido devuelto por OpenAI (para depuración):", raw_content)
                 st.stop()
 
             # Mostrar título, texto, explicación y preguntas
