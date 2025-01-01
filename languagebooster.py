@@ -1,15 +1,18 @@
 import streamlit as st
-from openai import OpenAIAPI
+import openai  # Usar el cliente OpenAI correctamente
 import random
 
 # Configuración inicial
-st.set_page_config(page_title="Aprende Idiomas", layout="centered")
+st.set_page_config(page_title="Your Language Booster", layout="centered")
 
 # Encabezado de la aplicación
-st.title("Aprende Idiomas")
+st.title("Your Language Booster")
 st.markdown(
-    "Selecciona un idioma, nivel y tema para practicar tu comprensión lectora. "
-    "La aplicación generará un texto y preguntas de comprensión para ayudarte a mejorar."
+    """
+    ¡Bienvenido a Your Language Booster! 🌍📚  
+    Selecciona un idioma, nivel y tema para practicar tu comprensión lectora. 
+    La aplicación generará un texto y preguntas para ayudarte a mejorar.
+    """
 )
 
 # Selección de parámetros
@@ -17,19 +20,17 @@ idioma = st.selectbox("Selecciona el idioma", ["Inglés", "Italiano"])
 nivel = st.selectbox("Selecciona el nivel CEFR", ["A1", "A2", "B1", "B2", "C1", "C2"])
 tema = st.selectbox("Selecciona el tema", ["Viajes", "Historia", "Cultura General"])
 
-# Botón para generar texto
+# Botón para generar texto y preguntas
 if st.button("Generar Texto y Preguntas"):
     with st.spinner("Generando texto y preguntas..."):
-        # Llamada a OpenAI para generar el texto
-        # Nota: Sustituye 'your_api_key' con una referencia segura en tu implementación final
         try:
-            import openai
-            openai.api_key = st.secrets["openai_api_key"]
+            # Usar la clave API almacenada en secretos
+            openai.api_key = st.secrets["openai"]["api_key"]
 
-            # Promp para generar texto
+            # Prompt para generar texto
             prompt = (
                 f"Genera un texto en {idioma.lower()} con un nivel de dificultad {nivel} "
-                f"sobre el tema {tema}. El texto debe tener entre 150 y 200 palabras y ser interesante, "
+                f"sobre el tema {tema}. El texto debe tener entre 150 y 200 palabras, ser interesante, "
                 "real y con hechos relevantes."
             )
 
