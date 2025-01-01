@@ -17,8 +17,18 @@ st.markdown(
 
 # Selección de parámetros
 idioma = st.selectbox("Selecciona el idioma", ["Inglés", "Italiano"])
-nivel = st.selectbox("Selecciona el nivel CEFR", ["A1", "A2", "B1", "B2", "C1", "C2"])
-tema = st.selectbox("Selecciona el tema", ["Viajes", "Historia", "Cultura General"])
+nivel = st.selectbox(
+    "Selecciona el nivel CEFR",
+    [
+        "A1 - Principiante 1",
+        "A2 - Principiante 2",
+        "B1 - Intermedio 1",
+        "B2 - Intermedio 2",
+        "C1 - Avanzado 1",
+        "C2 - Avanzado 2",
+    ],
+)
+tema = st.selectbox("Selecciona el tema", ["Cultura", "Viajes", "Moda", "Historia"])
 
 # Botón para generar texto y preguntas
 if st.button("Generar Texto y Preguntas"):
@@ -29,7 +39,7 @@ if st.button("Generar Texto y Preguntas"):
 
             # Prompt para generar texto y título
             prompt_texto = (
-                f"Escribe un texto en {idioma.lower()} con un nivel de dificultad {nivel} "
+                f"Escribe un texto en {idioma.lower()} con un nivel de dificultad {nivel.split(' ')[0]} "
                 f"sobre el tema {tema}. El texto debe tener entre 150 y 200 palabras, ser interesante, "
                 "real y con hechos relevantes. También proporciona un título breve y relevante para el texto."
             )
