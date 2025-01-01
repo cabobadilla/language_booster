@@ -1,6 +1,7 @@
 import streamlit as st
 import openai  # Usar el cliente OpenAI correctamente
 import random
+import json  # Para manejar JSON de forma segura
 
 # Configuración inicial
 st.set_page_config(page_title="Your Language Booster", layout="centered")
@@ -52,8 +53,9 @@ if st.button("Generar Texto y Preguntas"):
             # Generar preguntas de comprensión
             prompt_preguntas = (
                 f"A partir del siguiente texto, genera 5 preguntas de selección múltiple con 4 opciones "
-                f"y una sola respuesta correcta. El texto es: \"{texto_generado}\". Devuelve las preguntas "
-                f"y opciones en un formato estructurado en JSON."
+                f"y una sola respuesta correcta. El texto es: \"{texto_generado}\". "
+                "Devuelve las preguntas en formato JSON. Ejemplo: "
+                '{"preguntas": [{"pregunta": "Pregunta 1", "opciones": ["A", "B", "C", "D"], "correcta": "A"}]}'
             )
 
             response_preguntas = openai.ChatCompletion.create(
@@ -65,9 +67,16 @@ if st.button("Generar Texto y Preguntas"):
                 temperature=0.7,
                 max_tokens=300,
             )
-            preguntas_json = eval(response_preguntas['choices'][0]['message']['content'].strip())
-            preguntas = preguntas_json["preguntas"]
 
+            # Parsear respuesta JSON
+            try:
+                preguntas_json = json.loads(response_preguntas['choices'][0]['message']['content'].strip())
+                preguntas = preguntas_json["preguntas"]
+            except json.JSONDecodeError:
+                st.error("Hubo un error al procesar las preguntas. Intenta nuevamente.")
+                st.stop()
+
+            # Mostrar preguntas de comprensión
             st.subheader("Preguntas de Comprensión")
             respuestas_usuario = []
 
