@@ -104,26 +104,23 @@ if st.button("Generar Texto y Preguntas"):
             st.subheader("Temas Principales")
             st.write(f"💡 {explicacion}")
 
-            # Inicializar respuestas en el estado de sesión
-            if "respuestas_correctas" not in st.session_state:
-                st.session_state["respuestas_correctas"] = []
-
             # Mostrar preguntas de comprensión
             st.subheader("Preguntas de Comprensión")
+            respuestas_correctas = []
             if preguntas:
                 for i, pregunta in enumerate(preguntas, 1):
                     st.markdown(f"**{i}. {pregunta['pregunta']}**")
-                    # Almacenar las respuestas correctas en el estado de sesión
-                    if len(st.session_state["respuestas_correctas"]) < len(preguntas):
-                        st.session_state["respuestas_correctas"].append(pregunta.get("correcta", "No disponible"))
+                    respuestas_correctas.append(pregunta.get("correcta", "No disponible"))
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
 
-            # Botón para mostrar respuestas correctas
-            if st.button("Ver Respuestas"):
-                st.subheader("Respuestas Correctas")
-                for i, respuesta in enumerate(st.session_state["respuestas_correctas"], 1):
-                    st.write(f"{i}. {respuesta}")
+            # Mostrar respuestas correctas en tamaño pequeño
+            st.subheader("Respuestas Correctas")
+            for i, respuesta in enumerate(respuestas_correctas, 1):
+                st.markdown(
+                    f"<p style='font-size:10px; color:gray'>{i}. {respuesta}</p>",
+                    unsafe_allow_html=True,
+                )
 
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
