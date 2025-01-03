@@ -112,9 +112,9 @@ if st.button("Generar Texto y Preguntas"):
             # Mostrar preguntas de comprensión
             st.subheader("Preguntas de Comprensión")
             if preguntas:
-                for i, pregunta in enumerate(preguntas, 1):
-                    pregunta_texto = pregunta['pregunta']
-                    sugerencia = pregunta.get('sugerencia', '').strip()
+                for i, pregunta_data in enumerate(preguntas, 1):
+                    pregunta_texto = pregunta_data.get('pregunta', 'Pregunta no disponible')
+                    sugerencia = pregunta_data.get('sugerencia', '').strip()
                     if sugerencia:  # Agregar solo si hay sugerencia
                         st.markdown(f"**{i}. {pregunta_texto} [{sugerencia}]**")
                     else:
