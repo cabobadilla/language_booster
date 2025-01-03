@@ -94,33 +94,27 @@ if st.button("Generar Texto y Preguntas"):
                 st.text_area("Contenido devuelto por OpenAI (para depuración):", raw_content)
                 st.stop()
 
-            # Mostrar título, texto, explicación y preguntas
+            # Mostrar título y texto
             st.subheader("Título del Texto")
             st.write(f"📖 {texto_generado.splitlines()[0]}")  # Título como primera línea del texto
 
             st.subheader("Texto Generado")
             st.write("\n".join(texto_generado.splitlines()[1:]))  # El resto es el texto
 
-            st.subheader("Temas Principales")
-            st.write(f"💡 {explicacion}")
-
             st.subheader("Preguntas de Comprensión")
             respuestas_correctas = []
             if preguntas:
                 for i, pregunta in enumerate(preguntas, 1):
                     st.markdown(f"**{i}. {pregunta['pregunta']}**")
-                    opciones = pregunta.get("opciones", [])
-                    for opcion in opciones:
-                        st.write(f"- {opcion}")
                     respuestas_correctas.append(pregunta.get("correcta", "No disponible"))
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
 
             # Botón para mostrar respuestas correctas
             if st.button("Ver Respuestas"):
-                st.subheader("Tus Respuestas")
+                st.subheader("Respuestas Correctas")
                 for i, respuesta in enumerate(respuestas_correctas, 1):
-                    st.write(f"{i}. Respuesta Correcta: {respuesta}")
+                    st.write(f"{i}. {respuesta}")
 
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
