@@ -59,8 +59,9 @@ if st.button("Generar Texto y Preguntas"):
             prompt_explicacion_y_preguntas = (
                 f"Con base en el siguiente texto, escribe una breve explicación en {idioma.lower()} "
                 f"acerca de los principales puntos o temas que el lector debería haber entendido o aprendido "
-                f"del texto. Después de la explicación, genera 5 preguntas simples en {idioma.lower()} que evalúen la comprensión. "
-                f"Devuelve los resultados en formato JSON estructurado con las claves: 'explicacion' y 'preguntas'. "
+                f"del texto. Después de la explicación, genera 5 preguntas simples en {idioma.lower()} que evalúen la comprensión, "
+                f"incluyendo las respuestas correctas. Devuelve los resultados en formato JSON estructurado "
+                f"con las claves: 'explicacion', 'preguntas' (con opciones y respuestas correctas). "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
             )
@@ -101,14 +102,24 @@ if st.button("Generar Texto y Preguntas"):
             st.write("\n".join(texto_generado.splitlines()[1:]))  # El resto es el texto
 
             st.subheader("Temas Principales")
-            st.write(explicacion)
+            st.write(f"💡 {explicacion}")
 
             st.subheader("Preguntas de Comprensión")
+            respuestas_correctas = []
             if preguntas:
                 for i, pregunta in enumerate(preguntas, 1):
-                    st.markdown(f"**{i}. {pregunta}**")
+                    st.markdown(f"**{i}. {pregunta['pregunta']}**")
+                    opciones = pregunta.get("opciones", [])
+                    for opcion in opciones:
+                        st.write(f"- {opcion}")
+                    respuestas_correctas.append(pregunta.get("correcta", "No disponible"))
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
+
+            # Mostrar sección de respuestas correctas
+            st.subheader("Tus Respuestas")
+            for i, respuesta in enumerate(respuestas_correctas, 1):
+                st.markdown(f"<p style='font-size:small'>**{i}.** Respuesta Correcta: {respuesta}</p>", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
