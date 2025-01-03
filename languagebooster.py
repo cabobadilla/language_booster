@@ -60,10 +60,10 @@ if st.button("Generar Texto y Preguntas"):
             prompt_vocabulario_y_preguntas = (
                 f"Con base en el siguiente texto, selecciona exactamente 5 palabras clave en {idioma.lower()} "
                 f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
-                f"y agrega una sugerencia indirecta al final de cada pregunta que ayude a formular la respuesta sin ser la respuesta directa. "
+                f"y agrega una sugerencia indirecta en un apartado separado. Las sugerencias deben ayudar a construir la respuesta sin ser directas. "
                 f"Por ejemplo: para 'Where is Machu Picchu located?', la sugerencia podría ser 'country in South America', no 'Peru'. "
                 f"Cada sugerencia debe ser breve (máximo 3-4 palabras). "
-                f"Devuelve los resultados en formato JSON estructurado con las claves: 'palabras_clave' y 'preguntas'. "
+                f"Devuelve los resultados en formato JSON estructurado con las claves: 'palabras_clave', 'preguntas' y 'sugerencias'. "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
             )
@@ -91,6 +91,7 @@ if st.button("Generar Texto y Preguntas"):
                 resultado = json.loads(sanitized_content)
                 palabras_clave = resultado.get("palabras_clave", [])
                 preguntas = resultado.get("preguntas", [])
+                sugerencias = resultado.get("sugerencias", [])
             except (json.JSONDecodeError, ValueError) as e:
                 st.error(f"Error al procesar el formato JSON. Detalles: {e}")
                 st.text_area("Contenido devuelto por OpenAI (para depuración):", raw_content)
@@ -114,14 +115,20 @@ if st.button("Generar Texto y Preguntas"):
             # Mostrar preguntas de comprensión
             st.subheader("Preguntas de Comprensión")
             if preguntas:
-                for i, pregunta_data in enumerate(preguntas, 1):
-                    pregunta_texto = pregunta_data.get('pregunta', 'Pregunta no disponible')
-                    sugerencia = pregunta_data.get('sugerencia', '').replace("Focus on ", "").strip()
-                    # Reducir sugerencia a máximo 3-4 palabras
-                    sugerencia = " ".join(sugerencia.split()[:4]) if sugerencia else "Pista indirecta"
-                    st.markdown(f"**{i}.- {pregunta_texto}**\n--> {sugerencia}")
+                for i, pregunta_texto in enumerate(preguntas, 1):
+                    st.markdown(f"**{i}.- {pregunta_texto}**")
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
+
+            # Mostrar sugerencias a las preguntas
+            st.subheader("Sugerencias a las Preguntas")
+            if sugerencias:
+                for i, sugerencia in enumerate(sugerencias, 1):
+                    # Reducir sugerencia a máximo 3-4 palabras
+                    sugerencia = " ".join(sugerencia.split()[:4]) if sugerencia else "Sin sugerencia"
+                    st.markdown(f"**{i}.-** {sugerencia}")
+            else:
+                st.write("No se generaron sugerencias. Intenta nuevamente.")
 
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
