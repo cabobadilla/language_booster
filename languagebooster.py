@@ -116,10 +116,11 @@ if st.button("Generar Texto y Preguntas"):
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
 
-            # Mostrar sección de respuestas correctas
-            st.subheader("Tus Respuestas")
-            for i, respuesta in enumerate(respuestas_correctas, 1):
-                st.markdown(f"<p style='font-size:small'>**{i}.** Respuesta Correcta: {respuesta}</p>", unsafe_allow_html=True)
+            # Botón para mostrar respuestas correctas
+            if st.button("Ver Respuestas"):
+                st.subheader("Tus Respuestas")
+                for i, respuesta in enumerate(respuestas_correctas, 1):
+                    st.write(f"{i}. Respuesta Correcta: {respuesta}")
 
         except Exception as e:
             st.error(f"Hubo un error al generar el contenido: {e}")
