@@ -55,12 +55,12 @@ if st.button("Generar Texto y Preguntas"):
             )
             texto_generado = response_texto['choices'][0]['message']['content'].strip()
 
-            # Prompt para generar vocabulario y preguntas
+            # Prompt para generar palabras clave y preguntas
             prompt_vocabulario_y_preguntas = (
-                f"Con base en el siguiente texto, selecciona de 5 a 7 palabras clave en {idioma.lower()} "
+                f"Con base en el siguiente texto, selecciona exactamente 5 palabras clave en {idioma.lower()} "
                 f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
-                f"incluyendo las respuestas correctas. Devuelve los resultados en formato JSON estructurado "
-                f"con las claves: 'vocabulario' (lista de palabras clave) y 'preguntas' (con opciones y respuestas correctas). "
+                f"incluyendo conceptos clave como respuestas correctas. Devuelve los resultados en formato JSON estructurado "
+                f"con las claves: 'palabras_clave' (lista de palabras clave) y 'preguntas' (con conceptos clave como respuestas correctas). "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
             )
@@ -68,7 +68,7 @@ if st.button("Generar Texto y Preguntas"):
             response_vocabulario_y_preguntas = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Eres un generador de vocabulario y preguntas educativas."},
+                    {"role": "system", "content": "Eres un generador de palabras clave y preguntas educativas."},
                     {"role": "user", "content": prompt_vocabulario_y_preguntas},
                 ],
                 temperature=0.7,
@@ -86,7 +86,7 @@ if st.button("Generar Texto y Preguntas"):
 
                 # Parsear JSON
                 resultado = json.loads(sanitized_content)
-                vocabulario = resultado.get("vocabulario", [])
+                palabras_clave = resultado.get("palabras_clave", [])
                 preguntas = resultado.get("preguntas", [])
             except (json.JSONDecodeError, ValueError) as e:
                 st.error(f"Error al procesar el formato JSON. Detalles: {e}")
@@ -100,11 +100,11 @@ if st.button("Generar Texto y Preguntas"):
             st.subheader("Texto Generado")
             st.write("\n".join(texto_generado.splitlines()[1:]))  # El resto es el texto
 
-            # Mostrar vocabulario
-            st.subheader("Vocabulario")
-            if vocabulario:
-                st.write("Palabras clave:")
-                st.write(", ".join(vocabulario))
+            # Mostrar palabras clave
+            st.subheader("Palabras Clave")
+            if palabras_clave:
+                st.write("Palabras importantes para comprender el texto:")
+                st.write("\n".join([f"- {palabra}" for palabra in palabras_clave]))
             else:
                 st.write("No se generaron palabras clave. Intenta nuevamente.")
 
@@ -114,7 +114,7 @@ if st.button("Generar Texto y Preguntas"):
             if preguntas:
                 for i, pregunta in enumerate(preguntas, 1):
                     st.markdown(f"**{i}. {pregunta['pregunta']}**")
-                    respuestas_correctas.append(pregunta.get("correcta", "No disponible"))
+                    respuestas_correctas.append(pregunta.get("correcta", "Concepto no disponible"))
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
 
