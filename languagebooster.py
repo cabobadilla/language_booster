@@ -60,8 +60,9 @@ if st.button("Generar Texto y Preguntas"):
             prompt_vocabulario_y_preguntas = (
                 f"Con base en el siguiente texto, selecciona exactamente 5 palabras clave en {idioma.lower()} "
                 f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
-                f"y agrega una sola sugerencia como un concepto clave relacionado con la pregunta pero que no sea la respuesta. "
-                f"Cada sugerencia debe ser breve (máximo 3 palabras) y útil para construir la respuesta. "
+                f"y agrega una sugerencia indirecta al final de cada pregunta que ayude a formular la respuesta sin ser la respuesta directa. "
+                f"Por ejemplo: para 'Where is Machu Picchu located?', la sugerencia podría ser 'country in South America', no 'Peru'. "
+                f"Cada sugerencia debe ser breve (máximo 3-4 palabras). "
                 f"Devuelve los resultados en formato JSON estructurado con las claves: 'palabras_clave' y 'preguntas'. "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
@@ -116,8 +117,8 @@ if st.button("Generar Texto y Preguntas"):
                 for i, pregunta_data in enumerate(preguntas, 1):
                     pregunta_texto = pregunta_data.get('pregunta', 'Pregunta no disponible')
                     sugerencia = pregunta_data.get('sugerencia', '').replace("Focus on ", "").strip()
-                    # Reducir sugerencia a máximo 3 palabras
-                    sugerencia = " ".join(sugerencia.split()[:3]) if sugerencia else "Relación indirecta"
+                    # Reducir sugerencia a máximo 3-4 palabras
+                    sugerencia = " ".join(sugerencia.split()[:4]) if sugerencia else "Pista indirecta"
                     st.markdown(f"**{i}.- {pregunta_texto}**\n--> {sugerencia}")
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
