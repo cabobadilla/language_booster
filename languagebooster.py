@@ -55,22 +55,21 @@ if st.button("Generar Texto y Preguntas"):
             )
             texto_generado = response_texto['choices'][0]['message']['content'].strip()
 
-            # Prompt para generar explicación y preguntas
-            prompt_explicacion_y_preguntas = (
-                f"Con base en el siguiente texto, escribe una breve explicación en {idioma.lower()} "
-                f"acerca de los principales puntos o temas que el lector debería haber entendido o aprendido "
-                f"del texto. Después de la explicación, genera 5 preguntas simples en {idioma.lower()} que evalúen la comprensión, "
+            # Prompt para generar vocabulario y preguntas
+            prompt_vocabulario_y_preguntas = (
+                f"Con base en el siguiente texto, selecciona de 5 a 7 palabras clave en {idioma.lower()} "
+                f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
                 f"incluyendo las respuestas correctas. Devuelve los resultados en formato JSON estructurado "
-                f"con las claves: 'explicacion', 'preguntas' (con opciones y respuestas correctas). "
+                f"con las claves: 'vocabulario' (lista de palabras clave) y 'preguntas' (con opciones y respuestas correctas). "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
             )
 
-            response_explicacion_y_preguntas = openai.ChatCompletion.create(
+            response_vocabulario_y_preguntas = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Eres un generador de explicaciones y preguntas educativas."},
-                    {"role": "user", "content": prompt_explicacion_y_preguntas},
+                    {"role": "system", "content": "Eres un generador de vocabulario y preguntas educativas."},
+                    {"role": "user", "content": prompt_vocabulario_y_preguntas},
                 ],
                 temperature=0.7,
                 max_tokens=400,
@@ -78,7 +77,7 @@ if st.button("Generar Texto y Preguntas"):
 
             # Intentar parsear el JSON generado
             try:
-                raw_content = response_explicacion_y_preguntas['choices'][0]['message']['content'].strip()
+                raw_content = response_vocabulario_y_preguntas['choices'][0]['message']['content'].strip()
 
                 # Sanitizar contenido JSON
                 sanitized_content = raw_content.strip()
@@ -87,10 +86,10 @@ if st.button("Generar Texto y Preguntas"):
 
                 # Parsear JSON
                 resultado = json.loads(sanitized_content)
-                explicacion = resultado.get("explicacion", "No se pudo generar una explicación.")
+                vocabulario = resultado.get("vocabulario", [])
                 preguntas = resultado.get("preguntas", [])
             except (json.JSONDecodeError, ValueError) as e:
-                st.error(f"Error al procesar el formato JSON de las preguntas. Detalles: {e}")
+                st.error(f"Error al procesar el formato JSON. Detalles: {e}")
                 st.text_area("Contenido devuelto por OpenAI (para depuración):", raw_content)
                 st.stop()
 
@@ -101,8 +100,13 @@ if st.button("Generar Texto y Preguntas"):
             st.subheader("Texto Generado")
             st.write("\n".join(texto_generado.splitlines()[1:]))  # El resto es el texto
 
-            st.subheader("Temas Principales")
-            st.write(f"💡 {explicacion}")
+            # Mostrar vocabulario
+            st.subheader("Vocabulario")
+            if vocabulario:
+                st.write("Palabras clave:")
+                st.write(", ".join(vocabulario))
+            else:
+                st.write("No se generaron palabras clave. Intenta nuevamente.")
 
             # Mostrar preguntas de comprensión
             st.subheader("Preguntas de Comprensión")
@@ -118,7 +122,7 @@ if st.button("Generar Texto y Preguntas"):
             st.subheader("Respuestas Correctas")
             for i, respuesta in enumerate(respuestas_correctas, 1):
                 st.markdown(
-                    f"<p style='font-size:10px; color:gray'>{i}. {respuesta}</p>",
+                    f"<p style='font-size:12px; color:gray'>{i}. {respuesta}</p>",
                     unsafe_allow_html=True,
                 )
 
