@@ -60,8 +60,8 @@ if st.button("Generar Texto y Preguntas"):
             prompt_vocabulario_y_preguntas = (
                 f"Con base en el siguiente texto, selecciona exactamente 5 palabras clave en {idioma.lower()} "
                 f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
-                f"y agrega una sola sugerencia como un concepto clave simple después de cada pregunta. "
-                f"Cada sugerencia debe tener un máximo de 3 palabras. "
+                f"y agrega una sola sugerencia como un concepto clave relacionado con la pregunta pero que no sea la respuesta. "
+                f"Cada sugerencia debe ser breve (máximo 3 palabras) y útil para construir la respuesta. "
                 f"Devuelve los resultados en formato JSON estructurado con las claves: 'palabras_clave' y 'preguntas'. "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
@@ -117,7 +117,7 @@ if st.button("Generar Texto y Preguntas"):
                     pregunta_texto = pregunta_data.get('pregunta', 'Pregunta no disponible')
                     sugerencia = pregunta_data.get('sugerencia', '').replace("Focus on ", "").strip()
                     # Reducir sugerencia a máximo 3 palabras
-                    sugerencia = " ".join(sugerencia.split()[:3]) if sugerencia else "Sin sugerencia"
+                    sugerencia = " ".join(sugerencia.split()[:3]) if sugerencia else "Relación indirecta"
                     st.markdown(f"**{i}.- {pregunta_texto}**\n--> {sugerencia}")
             else:
                 st.write("No se generaron preguntas. Intenta nuevamente.")
