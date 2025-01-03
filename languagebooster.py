@@ -3,13 +3,14 @@ import openai
 import json
 
 # Configuración inicial
-st.set_page_config(page_title="Your Language Booster", layout="centered")
+app_version = "20250101"
+st.set_page_config(page_title=f"Language Booster {app_version}", layout="centered")
 
 # Encabezado de la aplicación
-st.title("Your Language Booster")
+st.title(f"Language Booster {app_version}")
 st.markdown(
     """
-    ¡Bienvenido a Your Language Booster! 🌍📚  
+    ¡Bienvenido a Language Booster! 🌍📚  
     Selecciona un idioma, nivel y tema para practicar tu comprensión lectora. 
     La aplicación generará un texto y preguntas para ayudarte a mejorar.
     """
@@ -59,7 +60,7 @@ if st.button("Generar Texto y Preguntas"):
             prompt_vocabulario_y_preguntas = (
                 f"Con base en el siguiente texto, selecciona exactamente 5 palabras clave en {idioma.lower()} "
                 f"que sean importantes para entender el tema tratado. Después, genera 5 preguntas en {idioma.lower()} que evalúen la comprensión del texto, "
-                f"y agrega una sola sugerencia entre paréntesis al final de cada pregunta. La sugerencia debe ser simple y no exceder 3-4 palabras. "
+                f"y agrega una sola sugerencia entre corchetes al final de cada pregunta. La sugerencia debe ser simple y no exceder 3-4 palabras. "
                 f"Devuelve los resultados en formato JSON estructurado con las claves: 'palabras_clave' y 'preguntas'. "
                 f"Asegúrate de que el JSON esté correctamente formateado, sin errores de sintaxis. "
                 f"Texto: \"{texto_generado}\""
@@ -115,7 +116,7 @@ if st.button("Generar Texto y Preguntas"):
                     pregunta_texto = pregunta['pregunta']
                     sugerencia = pregunta.get('sugerencia', '').strip()
                     if sugerencia:  # Agregar solo si hay sugerencia
-                        st.markdown(f"**{i}. {pregunta_texto} ({sugerencia})**")
+                        st.markdown(f"**{i}. {pregunta_texto} [{sugerencia}]**")
                     else:
                         st.markdown(f"**{i}. {pregunta_texto}**")
             else:
